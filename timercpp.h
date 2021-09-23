@@ -2,18 +2,18 @@
 #include <thread>
 #include <chrono>
 #include <atomic>
+#include <functional>
 
 class Timer {
 	std::atomic<bool> active{true};
-	
     public:
-        void setTimeout(auto function, int delay);
-        void setInterval(auto function, int interval);
+        void setTimeout(std::function<void()> function, int delay);
+        void setInterval(std::function<void()> function, int interval);
         void stop();
 
 };
 
-void Timer::setTimeout(auto function, int delay) {
+void Timer::setTimeout(std::function<void()> function, int delay) {
     active = true;
     std::thread t([=]() {
         if(!active.load()) return;
@@ -24,7 +24,7 @@ void Timer::setTimeout(auto function, int delay) {
     t.detach();
 }
 
-void Timer::setInterval(auto function, int interval) {
+void Timer::setInterval(std::function<void()> function, int interval) {
     active = true;
     std::thread t([=]() {
         while(active.load()) {
